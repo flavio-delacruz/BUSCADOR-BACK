@@ -3,6 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import { z } from "zod";
 import { catalog } from "./data/catalog";
+import { notificationsRouter } from "./routes/notifications";
 
 export const app = express();
 app.disable("x-powered-by");
@@ -14,7 +15,7 @@ app.use(cors({
     return callback(new Error("Origen no autorizado"));
   }
 }));
-app.use(express.json({ limit: "32kb" }));
+app.use(express.json({ limit: "128kb" }));
 
 app.get("/api/health", (_request, response) => {
   response.json({ ok: true, service: "Buscador API", mode: "demo" });
@@ -41,8 +42,12 @@ app.get("/api/search", (request, response) => {
   response.json({ results, total: results.length, query: q, demo: true });
 });
 
+// Private API: enabled only when MongoDB and sync secrets are configured.
+app.use("/api/notifications", notificationsRouter);
+
 const errorHandler: ErrorRequestHandler = (error, _request, response, _next) => {
-  console.error("[Buscador] Error:", error instanceof Error ? error.message : "desconocido");
+  // Notification payloads and decryption details must never reach logs.
+  console.error("[Buscador] Error interno:", error instanceof Error ? error.name : "desconocido");
   response.status(500).json({ error: "No se pudo procesar la solicitud" });
 };
 app.use(errorHandler);
