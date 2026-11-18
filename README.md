@@ -84,3 +84,24 @@ En lugar de un ejemplo de fecha fija, usa una marca temporal actual
 - Si pierdes o cambias `SYNC_ENCRYPTION_KEY`, no podrás descifrar el contenido anterior.
 
 El archivo local de la app Android no se modifica con estas rutas.
+
+## Cuentas de Buscador (inicio de sesión real)
+
+Con `MONGODB_URI` configurado y conectado, el backend ofrece:
+
+- `POST /api/auth/register`: correo y contraseña (mínimo 10 caracteres).
+- `POST /api/auth/login`: valida las credenciales.
+- `GET /api/auth/me`: valida una sesión con `Authorization: Bearer <token>`.
+- `POST /api/auth/logout`: revoca esa sesión.
+
+Las contraseñas se guardan mediante scrypt y sal aleatoria. Los tokens de
+sesión son aleatorios; MongoDB solo almacena un hash y una expiración de 7 días.
+Son cuentas reales del servidor, no un login simulado. No hay recuperación
+de contraseña, verificación de correo ni OAuth todavía; para cuentas públicas
+hacen falta esos módulos y protección de tasas distribuida.
+
+**Privacidad:** las sesiones de inicio de sesión son independientes del token
+privado `SYNC_API_TOKEN` que controla el respaldo de notificaciones de esta
+fase de un solo propietario. Iniciar sesión **no activa** el acceso a las
+notificaciones ni la sincronización remota. Ninguna notificación personal se
+sube por el mero hecho de crear una cuenta.

@@ -4,6 +4,7 @@ import helmet from "helmet";
 import { z } from "zod";
 import { catalog } from "./data/catalog";
 import { notificationsRouter } from "./routes/notifications";
+import { authRouter } from "./routes/auth";
 
 export const app = express();
 app.disable("x-powered-by");
@@ -41,6 +42,9 @@ app.get("/api/search", (request, response) => {
   );
   response.json({ results, total: results.length, query: q, demo: true });
 });
+
+// Auth requires connected MongoDB; credentials are never stored as plaintext.
+app.use("/api/auth", authRouter);
 
 // Private API: enabled only when MongoDB and sync secrets are configured.
 app.use("/api/notifications", notificationsRouter);
