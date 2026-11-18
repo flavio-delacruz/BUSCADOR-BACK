@@ -1,7 +1,7 @@
 name: Buscador backend quality
 on:
   push:
-    branches: [main, feat/consented-notification-sync]
+    branches: [main, feat/consented-notification-sync, feat/real-email-password-auth]
   pull_request:
   workflow_dispatch:
 
